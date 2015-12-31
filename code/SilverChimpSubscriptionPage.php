@@ -4,7 +4,8 @@
  * @author Matt Cockayne <matt@zucchi.co.uk>
  * @package SilverChimp 
  */
-class SilverChimpSubscriptionPage extends Page {
+class SilverChimpSubscriptionPage extends Page
+{
 
     /**
      * Definition of additional data fields required for SilverChimp
@@ -38,7 +39,7 @@ class SilverChimpSubscriptionPage extends Page {
         $siteConfig = $this->getSiteConfig();
         $api_key = $siteConfig->ChimpApiKey;
         if (!$api_key && strlen($api_key) == 0) {
-            $fields->addFieldsToTab('Root.ChimpSettings',array(
+            $fields->addFieldsToTab('Root.ChimpSettings', array(
                 new LiteralField("ChimpFieldsInto", _t('SilverChimp.APIKEYNOTSET', 'You must configure your MailChimp API Key in site settings')),
             ));
             return $fields;
@@ -48,7 +49,7 @@ class SilverChimpSubscriptionPage extends Page {
         $lists = $api->lists();
 
         $listSource = array();
-        foreach ($lists['data'] AS $l) {
+        foreach ($lists['data'] as $l) {
             $listSource[$l['id']] = $l['name'];
         }
 
@@ -59,8 +60,8 @@ class SilverChimpSubscriptionPage extends Page {
         $message .= _t('SilverChimp.SETTINGSNOTE', "You must save your changes to display/update the Chimp Fields tab");
         $message .=  "</p>";
 
-        $fields->addFieldsToTab($settingsTab,array(
-            new DropdownField('ListID', _t('SilverChimp.LISTLABEL', 'Select the list you wish to use'),$listSource),
+        $fields->addFieldsToTab($settingsTab, array(
+            new DropdownField('ListID', _t('SilverChimp.LISTLABEL', 'Select the list you wish to use'), $listSource),
             new OptionsetField("DisableGroupSelection", _t('SilverChimp.DISABLEGROUPS', "Disable groups from appearing on the frontend"), array(0 => 'Enable', 1 => 'Disable')),
             new OptionsetField("AllowUpdateExisting", _t('SilverChimp.UPDATEEXISTING', "Allow a subscriber to update an existing subscription"), array(0 => 'No', 1 => 'Yes'), $siteConfig->ChimpUpdateExisting),
             new TextField('SubscribeButtonText', _t('SilverChimp.BUTTONTEXT', "What text do you want to appear on the Subscribe button")),
@@ -81,7 +82,7 @@ class SilverChimpSubscriptionPage extends Page {
             $fields->addFieldsToTab($fieldsTab, new LiteralField("ChimpFieldsIntro", $message));
 
             foreach ($mergeVars as $var) {
-                $fields->addFieldToTab($fieldsTab, new ReadonlyField('SC-' . $var['tag'], $var['tag'], $var['name'] , ' (' . $var['field_type'] . ')'));
+                $fields->addFieldToTab($fieldsTab, new ReadonlyField('SC-' . $var['tag'], $var['tag'], $var['name'], ' (' . $var['field_type'] . ')'));
             }
 
 
@@ -100,7 +101,7 @@ class SilverChimpSubscriptionPage extends Page {
             $groupDefaults = unserialize($this->DefaultGroupSelections);
 
             if (is_array($groupData) || $groupData instanceof Traversable) {
-                foreach ($groupData AS $gr) {
+                foreach ($groupData as $gr) {
                     $source = array();
                     foreach ($gr['groups'] as $opt) {
                         $source[$opt['bit']] = $opt['name'];
@@ -138,12 +139,12 @@ class SilverChimpSubscriptionPage extends Page {
             $groupData = $api->listInterestGroupings($this->ListID);
             // loop
             if ($groupData && !empty($groupData)) {
-                foreach ($groupData AS $gr) {
+                foreach ($groupData as $gr) {
                     // evaluate the field name used
                     $name = 'SCG-' . preg_replace('/[^0-9A-Za-z]/', '-', $gr['name']);
                     // get field value && set into defaults array
                     if (isset($_REQUEST[$name])) {
-                        $defaults[$name] = $_REQUEST[$name]; 
+                        $defaults[$name] = $_REQUEST[$name];
                     }
                 }
                 $this->DefaultGroupSelections = serialize($defaults);
@@ -158,7 +159,8 @@ class SilverChimpSubscriptionPage extends Page {
  * @author Matt Cockayne <matt@zucchi.co.uk>
  * @package SilverChimp
  */
-class SilverChimpSubscriptionPage_Controller extends Page_Controller {
+class SilverChimpSubscriptionPage_Controller extends Page_Controller
+{
 
     public static $allowed_actions = array(
         // someaction can be accessed by anyone, any time
@@ -190,7 +192,8 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
      * Build a form
      * @return mixed
      */
-    function Form() {
+    public function Form()
+    {
         if (Session::get('SilverChimp.SUCCESS')) {
             Session::clear('SilverChimp.SUCCESS');
             return false;
@@ -202,7 +205,7 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
         
         // loop through and add merge variables
         if (is_array($mergeVars) || $mergeVars instanceof Traversable) {
-            foreach ($mergeVars AS $var) {
+            foreach ($mergeVars as $var) {
                 if ($new = $this->buildField($var)) {
                     if (is_array($new)) {
                         $fields = array_merge($fields, $new);
@@ -213,7 +216,6 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
                     if ($var['req']) {
                         $required[] = $var['tag'];
                     }
-
                 }
             }
         }
@@ -222,7 +224,7 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
         if (false == $this->DisableGroupSelection) {
             $groupData = $this->api->listInterestGroupings($this->ListID);
             if (is_array($groupData) || $groupData instanceof Traversable) {
-                foreach ($groupData AS $gr) {
+                foreach ($groupData as $gr) {
                     if ($new = $this->buildGroupField($gr)) {
                         $fields[] = $new;
                     }
@@ -245,9 +247,11 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
      * Method to override page content with message on success
      * @return SilverChimpSubscriptionPage_Controller
      */
-    public function subscribeSuccess() {
-        if (Session::get('SilverChimp.SUCCESS'))
+    public function subscribeSuccess()
+    {
+        if (Session::get('SilverChimp.SUCCESS')) {
             $this->Content = $this->SubscribeSuccess;
+        }
         return $this;
     }
 
@@ -257,8 +261,8 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
      * @param Form $form
      * @return SilverChimpSubscriptionPage_Controller
      */
-    function SubscribeAction($raw_data, $form) {
-
+    public function SubscribeAction($raw_data, $form)
+    {
         $config = SiteConfig::current_site_config();
         $data = Convert::raw2sql($raw_data);
 
@@ -266,10 +270,10 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
         $mergeVars = $this->api->listMergeVars($this->ListID);
         
         // initialise data container
-        $postedVars = array(); 
+        $postedVars = array();
         
         // loop through merge vars and only poopulate data required
-        foreach ($mergeVars AS $var) {
+        foreach ($mergeVars as $var) {
             if (isset($data[$var['tag']])) {
                 $postedVars[$var['tag']] = $data[$var['tag']];
             }
@@ -282,8 +286,8 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
         $groupDefaults = unserialize($this->DefaultGroupSelections);
 
         if (is_array($groupData) || $groupData instanceof Traversable) {
-        // loop through groups
-            foreach ($groupData AS $gr) {
+            // loop through groups
+            foreach ($groupData as $gr) {
                 // initialise valiable containing the key for defaults test
                 $defaultsName = 'SCG-' . preg_replace('/[^0-9A-Za-z]/', '-', $gr['name']);
 
@@ -291,7 +295,7 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
                 if (isset($data['GROUPINGS'][$gr['name']])) {
                     $newGroups = array();
                     // check current group is in submitted values
-                    foreach ($gr['groups'] AS $gd) {
+                    foreach ($gr['groups'] as $gd) {
                         if (in_array($gd['bit'], $data['GROUPINGS'][$gr['name']])) {
                             $newGroups[] = $gd['name'];
                         }
@@ -300,14 +304,12 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
                     // add groups to data for subscription
                     $postedVars['GROUPINGS'][] = array(
                         'name' => $gr['name'],
-                        'groups' => implode(',',$newGroups),
+                        'groups' => implode(',', $newGroups),
                     );
-
-
-                } else if (isset($groupDefaults[$defaultsName])) { // if defaults present
+                } elseif (isset($groupDefaults[$defaultsName])) { // if defaults present
                     $newGroups = array();
                     // loop through groups and check in defaults
-                    foreach ($gr['groups'] AS $gd) {
+                    foreach ($gr['groups'] as $gd) {
                         if (in_array($gd['bit'], $groupDefaults[$defaultsName])) {
                             $newGroups[] = $gd['name'];
                         }
@@ -316,7 +318,7 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
                     // add groups to data for subscription
                     $postedVars['GROUPINGS'][] = array(
                         'name' => $gr['name'],
-                        'groups' => implode(',',$newGroups),
+                        'groups' => implode(',', $newGroups),
                     );
                 }
             }
@@ -325,9 +327,9 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
 
         // send subscription data to MailChimp
         $result = $this->api->listSubscribe(
-            $this->ListID, 
-            $postedVars['EMAIL'], 
-            $postedVars, 
+            $this->ListID,
+            $postedVars['EMAIL'],
+            $postedVars,
             $config->ChimpEmailType,
             $config->ChimpDoubleOptIn,
             $this->AllowUpdateExisting,
@@ -339,7 +341,6 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
             //    success!
             Session::set('SilverChimp.SUCCESS', true);
             return $this->subscribeSuccess();
-            
         } else {
             //    failure!
             $form->sessionMessage($this->api->errorMessage, 'warning');
@@ -362,14 +363,14 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
                     return new EmailField($var['tag'], $var['name']);
                     break;
                 case 'dropdown':
-                    return new DropdownField($var['tag'],$var['name'], $var['choices']);
+                    return new DropdownField($var['tag'], $var['name'], $var['choices']);
                     break;
                 case 'radio':
-                        return new OptionsetField($var['tag'],$var['name'], $var['choices']);
+                        return new OptionsetField($var['tag'], $var['name'], $var['choices']);
                         break;
                 case 'date':
                 case 'birthday':
-                        return new DateField($var['tag'],$var['name']);
+                        return new DateField($var['tag'], $var['name']);
                     break;
                 case 'address':
                     return array(
@@ -379,7 +380,7 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
                         new TextField($var['tag'].'-4', _t('SilverChimp.ADDRESS4', 'State/Province/Region')),
                         new TextField($var['tag'].'-5', _t('SilverChimp.ADDRESS5', 'Postal/Zip Code')),
                         new CountryDropdownField($var['tag'].'-6', _t('SilverChimp.COUNTRY', 'Postal/Zip Code')),
-                    );    
+                    );
                     break;
                 case 'zip':
                     return new TextField($var['tag'].'-5', _t('SilverChimp.ADDRESS5', 'Postal/Zip Code'));
@@ -427,4 +428,3 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
         return false;
     }
 }
-

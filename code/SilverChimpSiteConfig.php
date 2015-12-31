@@ -16,7 +16,8 @@
  * @subpackage
  * @category
  */
-class SilverChimpSiteConfig extends DataExtension {
+class SilverChimpSiteConfig extends DataExtension
+{
 
     private static $db = array(
         'ChimpApiKey' => 'Text',
@@ -39,7 +40,8 @@ class SilverChimpSiteConfig extends DataExtension {
 
 
 
-    public function updateCMSFields(FieldList $fields) {
+    public function updateCMSFields(FieldList $fields)
+    {
         $fields->addFieldToTab("Root.SilverChimp", new TextField(
             'ChimpApiKey',
             _t('SilverChimp.APIKEY', 'API Key')
@@ -47,10 +49,10 @@ class SilverChimpSiteConfig extends DataExtension {
 
         $fields->addFieldToTab("Root.SilverChimp", new DropdownField(
             'ChimpEmailType',
-            _t('SilverChimp.SENDEMAILAS','Send Emails As'),
+            _t('SilverChimp.SENDEMAILAS', 'Send Emails As'),
             array(
-                'html' => _t('SilverChimp.SENDTYPEHTML','HTML'),
-                'text' => _t('SilverChimp.SENDTYPETEXT','Text'),
+                'html' => _t('SilverChimp.SENDTYPEHTML', 'HTML'),
+                'text' => _t('SilverChimp.SENDTYPETEXT', 'Text'),
             )
         ));
 
@@ -78,8 +80,5 @@ class SilverChimpSiteConfig extends DataExtension {
             'ChimpReplaceGroups',
             _t('SilverChimp.REPLACEGROUPSSETTING', 'Replace Groups')
         ));
-
-
-
     }
 }

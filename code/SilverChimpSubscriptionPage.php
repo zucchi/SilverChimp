@@ -342,7 +342,7 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
             
         } else {
             //    failure!
-            $form->sessionMessage($this->api->errorMessage, 'warning');
+            $form->sessionMessage($this->api->errorMessage, 'warning', false);
             return $this;
         }
     }

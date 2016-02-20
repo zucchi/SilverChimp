@@ -197,6 +197,11 @@ class SilverChimpSubscriptionPage_Controller extends Page_Controller {
         }
 
         $mergeVars = $this->api->listMergeVars($this->ListID);
+        
+        if(false === $mergeVars) {
+            return $this->api->errorMessage;
+        }
+        
         $fields = array();
         $required = array();
         
